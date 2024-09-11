@@ -80,10 +80,10 @@ export default function NavratriPass() {
         />
         <div className="name-text">
           <h1>
-            Name: <span>Darshan Vaghani</span>
+            Name: <span>{`${userData.fullname}`}</span>
           </h1>
           <h1>
-            Mo No: <span>+91991391499</span>
+            Mo No: <span>{`${userData.email}`}</span>
           </h1>
         </div>
       </div>

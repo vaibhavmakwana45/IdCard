@@ -55,6 +55,7 @@ ReactDOM.render(
           )}
         />
         <Route path="/viewfile" component={ViewFileLink} />
+        <Route path="/user" component={ViewFileLink} />
         <Redirect from="/" to="/auth/signin" />
       </Switch>
     </Router>

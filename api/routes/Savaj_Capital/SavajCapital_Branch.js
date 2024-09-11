@@ -223,7 +223,7 @@ router.get("/:branch_id", async (req, res) => {
     if (!data) {
       return res.status(200).json({
         statusCode: 201,
-        message: "Savaj Capital Branch not found",
+        message: "Sparrow E Pass Branch not found",
       });
     }
     res.json({

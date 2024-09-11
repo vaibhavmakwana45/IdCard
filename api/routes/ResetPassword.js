@@ -37,7 +37,7 @@ function isTokenValid(email) {
 //     const token = encryptedEmail;
 //     tokenExpirationMap.set(token, true);
 
-//     const subject = "Welcome to your new resident center with Savaj Capital";
+//     const subject = "Welcome to your new resident center with Sparrow E Pass";
 
 //     const logoUrl =
 //       "https://lh5.googleusercontent.com/p/AF1QipOyJre2lxZ1x9J76oq6yEXQptAixuoq8Kv0-bXU";
@@ -51,17 +51,17 @@ function isTokenValid(email) {
 //               <table width="600" cellpadding="20" cellspacing="0" style="border: 1px solid #ccc; margin-top: 20px;">
 //                 <tr style="background-color: #f8f8f8;">
 //                   <td align="center" style="padding: 10px;">
-//                     <img src="${logoUrl}" alt="Savaj Capital Logo" style="height: 100px; width: 200px;"/>
+//                     <img src="${logoUrl}" alt="Sparrow E Pass Logo" style="height: 100px; width: 200px;"/>
 //                   </td>
 //                 </tr>
 //                 <tr>
 //                   <td style="font-size: 16px; padding: 20px;">
 //                     <p>Hello,</p>
-//                     <p>Thank you for registering with Savaj Capital. To complete your registration, please set up your password by clicking on the link below:</p>
+//                     <p>Thank you for registering with Sparrow E Pass. To complete your registration, please set up your password by clicking on the link below:</p>
 //                     <p><a href="${passwordResetLink}" style="background-color: #0046d5; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Set Your Password</a></p>
 //                     <p>If the button above does not work, paste this link into your browser:</p>
 //                     <p><a href="${passwordResetLink}" style="color: #0046d5; text-decoration: none;">${passwordResetLink}</a></p>
-//                     <p>Best regards,<br>The Savaj Capital Team</p>
+//                     <p>Best regards,<br>The Sparrow E Pass Team</p>
 //                   </td>
 //                 </tr>
 //               </table>
@@ -96,7 +96,7 @@ function isTokenValid(email) {
 
 //     tokenExpirationMap.set(token, true);
 
-//     const subject = "Welcome to your new resident center with Savaj Capital";
+//     const subject = "Welcome to your new resident center with Sparrow E Pass";
 
 //     const text = `
 //     <p>Hello Sir/Ma'am,</p>
@@ -107,7 +107,7 @@ function isTokenValid(email) {
 //         }" style="text-decoration: none;">Set Password Link</a></p>
 
 //         <p>Best regards,<br>
-//         The Savaj Capital Team</p>
+//         The Sparrow E Pass Team</p>
 //     `;
 
 //     await emailService.sendWelcomeEmail(req.body.email, subject, text);
@@ -135,7 +135,7 @@ router.post("/passwordmail", async (req, res) => {
 
     tokenExpirationMap.set(token, true);
 
-    const subject = "Welcome to Your New Resident Center with Savaj Capital";
+    const subject = "Welcome to Your New Resident Center with Sparrow E Pass";
 
     // Logo URL
     const logoUrl = "https://cdn.dohost.in/upload/629imgpsh_fullsize_anim.jpg";
@@ -198,15 +198,15 @@ router.post("/passwordmail", async (req, res) => {
     </head>
     <body>
       <div class="container">
-        <img src="${logoUrl}" alt="Savaj Capital Logo" class="logo">
-        <h1 class="header">Welcome to Savaj Capital</h1>
+        <img src="${logoUrl}" alt="Sparrow E Pass Logo" class="logo">
+        <h1 class="header">Welcome to Sparrow E Pass</h1>
         <p>Hello,</p>
-        <p>Thank you for joining Savaj Capital. Please set your password by clicking the button below to activate your account:</p>
+        <p>Thank you for joining Sparrow E Pass. Please set your password by clicking the button below to activate your account:</p>
         <a href="${
           `https://admin.savajcapital.com/auth/setpassword?token=` + token
         }" class="button">Set Your Password</a>
         <p>If you did not request this email, please ignore it.</p>
-        <p>Best regards,<br>The Savaj Capital Team</p>
+        <p>Best regards,<br>The Sparrow E Pass Team</p>
       </div>
     </body>
     </html>

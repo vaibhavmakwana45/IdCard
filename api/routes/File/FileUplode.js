@@ -2481,10 +2481,10 @@ router.put("/updatestatus/:fileId", async (req, res) => {
           ).format("YYYY-MM-DD HH:mm:ss")}</li>
         </ul>
         <p>If you have any questions or need further assistance, please do not hesitate to contact us.</p>
-        <p>Thank you,<br>Savaj Capital</p>
+        <p>Thank you,<br>Sparrow E Pass</p>
       </div>
       <div style="background: #f5f5f5; padding: 10px; text-align: center; font-size: 12px; color: #888;">
-        <p>© ${new Date().getFullYear()} Savaj Capital. All rights reserved.</p>
+        <p>© ${new Date().getFullYear()} Sparrow E Pass. All rights reserved.</p>
       </div>
     </div>
   `;
