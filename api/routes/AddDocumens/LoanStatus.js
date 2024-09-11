@@ -6,32 +6,27 @@ const File_Uplode = require("../../models/File/File_Uplode");
 
 router.post("/", async (req, res) => {
   try {
-    let findLoanStatus = await LoanStatus.findOne({
-      loanstatus: { $regex: new RegExp(`^${req.body.loanstatus}$`, "i") },
-    });
-    if (!findLoanStatus) {
-      const timestamp = Date.now();
-      const uniqueId = `${timestamp}`;
+    const timestamp = Date.now();
+    const uniqueId = `${timestamp}`;
 
-      req.body["loanstatus_id"] = uniqueId;
-      req.body["createdAt"] = moment()
-        .utcOffset(330)
-        .format("YYYY-MM-DD HH:mm:ss");
-      req.body["updatedAt"] = moment()
-        .utcOffset(330)
-        .format("YYYY-MM-DD HH:mm:ss");
-      var data = await LoanStatus.create(req.body);
-      res.json({
-        success: true,
-        data: data,
-        message: "Add Loan Status Successfully",
-      });
-    } else {
-      res.json({
-        statusCode: 201,
-        message: `${req.body.loanstatus} Already Added`,
-      });
-    }
+    // Add unique ID, createdAt, updatedAt, and backgroundImage to the request body
+    req.body["loanstatus_id"] = uniqueId;
+    req.body["createdAt"] = moment()
+      .utcOffset(330)
+      .format("YYYY-MM-DD HH:mm:ss");
+    req.body["updatedAt"] = moment()
+      .utcOffset(330)
+      .format("YYYY-MM-DD HH:mm:ss");
+    req.body["backgroundImage"] = req.body.backgroundImage || "";
+
+    // Create new loan status
+    const data = await LoanStatus.create(req.body);
+
+    res.json({
+      success: true,
+      data: data,
+      message: "Loan Status added successfully",
+    });
   } catch (error) {
     res.json({
       statusCode: 500,

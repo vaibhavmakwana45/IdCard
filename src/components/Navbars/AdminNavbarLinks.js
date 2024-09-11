@@ -94,7 +94,7 @@ export default function HeaderLinks(props) {
   let navbarIcon =
     fixed && scrolled
       ? useColorModeValue("gray.700", "gray.200")
-      : useColorModeValue("white", "gray.200");
+      : useColorModeValue("black", "gray.200");
   const menuBg = useColorModeValue("white", "navy.800");
   const notificationBg = useColorModeValue("gray.50", "gray.700");
   const borderColor = useColorModeValue("gray.200", "gray.600");
@@ -276,14 +276,14 @@ export default function HeaderLinks(props) {
         </MenuButton>
         <MenuList p="16px 8px" bg={menuBg} mt="10px">
           <Flex flexDirection="column">
-            <MenuItem borderRadius="8px">
+            {/* <MenuItem borderRadius="8px">
               <Flex align="center" justifyContent="flex-start">
                 <FaUser color="currentColor" pr="20px" />
                 &nbsp; {accessType?.firstname} {accessType?.lastname}{" "}
                 {accessType?.username} {accessType?.full_name}{" "}
                 {accessType?.bankuser_name}
               </Flex>
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem borderRadius="8px">
               <Flex align="center" justifyContent="flex-start">
                 <FaEnvelope color="currentColor" pr="20px" />

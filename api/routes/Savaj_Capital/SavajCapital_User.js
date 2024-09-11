@@ -48,7 +48,6 @@ const currentDate = moment().utcOffset(330).format("YYYY-MM-DD HH:mm:ss");
 
 router.post("/", async (req, res) => {
   try {
-
     const user = await AddUser.findOne({ email: userDetails.email });
 
     if (user) {
@@ -72,7 +71,6 @@ router.post("/", async (req, res) => {
     req.body["password"] = hashedPassword;
 
     var data = await SavajCapital_User.create(req.body);
-
 
     if (ApiResponse.status === 200) {
       res.json({
@@ -190,6 +188,17 @@ router.get("/SavajCapital_User", async (req, res) => {
       matchStage.city = selectedCity;
     }
 
+    // Step 1: Get the total count of users in each group from the Adduser collection
+    const groupCounts = await AddUser.aggregate([
+      { $group: { _id: "$group_id", userCount: { $sum: 1 } } },
+    ]);
+
+    const groupCountMap = groupCounts.reduce((acc, group) => {
+      acc[group._id] = group.userCount;
+      return acc;
+    }, {});
+
+    // Step 2: Query SavajCapital_User and add the user count for each group_id
     const totalDataCount = await SavajCapital_User.countDocuments(matchStage);
     const pipeline = [
       { $match: matchStage },
@@ -200,9 +209,15 @@ router.get("/SavajCapital_User", async (req, res) => {
 
     const data = await SavajCapital_User.aggregate(pipeline);
 
+    // Map user counts to the result data
+    const enrichedData = data.map(user => ({
+      ...user,
+      userCountInGroup: groupCountMap[user.group_id] || 0
+    }));
+
     res.json({
       statusCode: 200,
-      data,
+      data: enrichedData,
       totalPages: Math.ceil(totalDataCount / dataPerPage),
       currentPage,
       totalCount: totalDataCount,
@@ -216,6 +231,7 @@ router.get("/SavajCapital_User", async (req, res) => {
     });
   }
 });
+
 
 router.get("/:branch_id", async (req, res) => {
   try {
@@ -251,12 +267,16 @@ router.get("/:branch_id", async (req, res) => {
     ]);
 
     const branchUserIds = branchUsers.map((user) => user.branchuser_id);
-    const branchAssigns = await Branch_Assign.find({ branchuser_id: { $in: branchUserIds } }).lean();
+    const branchAssigns = await Branch_Assign.find({
+      branchuser_id: { $in: branchUserIds },
+    }).lean();
     const fileIds = branchAssigns.map((assign) => assign.file_id);
     const files = await File_Uplode.find({ file_id: { $in: fileIds } }).lean();
 
     const loanStatusIds = files.map((file) => file.status);
-    const loanStatuses = await LoanStatus.find({ loanstatus_id: { $in: loanStatusIds } }).lean();
+    const loanStatuses = await LoanStatus.find({
+      loanstatus_id: { $in: loanStatusIds },
+    }).lean();
 
     const userIds = files.map((file) => file.user_id);
     const users = await AddUser.find({ user_id: { $in: userIds } }).lean();
@@ -264,7 +284,9 @@ router.get("/:branch_id", async (req, res) => {
     const loanIds = files.map((file) => file.loan_id);
     const loans = await Loan.find({ loan_id: { $in: loanIds } }).lean();
 
-    const loanStatusMap = new Map(loanStatuses.map((status) => [status.loanstatus_id, status]));
+    const loanStatusMap = new Map(
+      loanStatuses.map((status) => [status.loanstatus_id, status])
+    );
     const userMap = new Map(users.map((user) => [user.user_id, user]));
     const loanMap = new Map(loans.map((loan) => [loan.loan_id, loan]));
 
@@ -301,7 +323,10 @@ router.get("/:branch_id", async (req, res) => {
 
     branch.users = branchUserFiles;
     branch.user_count = branchUserFiles.length;
-    branch.file_count = branchUserFiles.reduce((acc, user) => acc + user.assigned_file_count, 0);
+    branch.file_count = branchUserFiles.reduce(
+      (acc, user) => acc + user.assigned_file_count,
+      0
+    );
 
     res.json({
       success: true,
@@ -318,7 +343,6 @@ router.get("/:branch_id", async (req, res) => {
     });
   }
 });
-
 
 // router.get("/:branch_id", async (req, res) => {
 //   try {
@@ -431,6 +455,50 @@ router.get("/:branch_id", async (req, res) => {
 //     });
 //   }
 // });
+router.put("/editsavajuser/:group_id", async (req, res) => {
+  const { group_id } = req.params;
+  const updates = req.body;
+
+  try {
+    const status =
+      req.body.cibil_score && req.body.cibil_score !== ""
+        ? "complete"
+        : "active";
+
+    if (req.body.password && req.body.password.trim() !== "") {
+      const hashedPassword = encrypt(req.body.password);
+      req.body.password = hashedPassword;
+    } else {
+      delete req.body.password;
+    }
+
+    const updatedUser = await SavajCapital_User.findOneAndUpdate(
+      { group_id: group_id },
+      { ...updates, status },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "User data updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error: " + error.message,
+    });
+  }
+});
+
 router.put("/:branchuser_id", async (req, res) => {
   try {
     const { branchuser_id } = req.params;

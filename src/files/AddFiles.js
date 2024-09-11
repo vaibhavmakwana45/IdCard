@@ -367,14 +367,14 @@ function AddFiles() {
         formData.append("files", item.file);
 
         const response = await axios.post(
-         "https://cdn.savajcapital.com/api/upload",
+          "https://cdn.savajcapital.com/api/upload",
           formData,
           {
             headers: {
               "Content-Type": "multipart/form-data",
             },
           }
-        ); 
+        );
 
         if (response.data.status !== "ok") {
           throw new Error(response.data.message || "File upload failed");

@@ -64,7 +64,7 @@ function Customer() {
     setAccessType(jwt._id);
   }, []);
 
-  console.log(accessType,"vaibhav")
+  console.log(accessType, "vaibhav");
 
   const states = State.getStatesOfCountry("IN");
 
@@ -91,16 +91,19 @@ function Customer() {
 
   const fetchData = async () => {
     try {
-      const response = await AxiosInstance.get(`/addusers/getallusers/${accessType.group_id}`, {
-        params: {
-          page: currentPage,
-          limit: itemsPerPage,
-          searchTerm: searchTerm,
-          selectedState: selectedState === "All State" ? "" : selectedState,
-          selectedCity: selectedCity === "All City" ? "" : selectedCity,
-       
-        },
-      });
+      const response = await AxiosInstance.get(
+        `/addusers/getallusers/${accessType.group_id}`,
+        {
+          params: {
+            page: currentPage,
+            limit: itemsPerPage,
+            searchTerm: searchTerm,
+            selectedState: selectedState === "All State" ? "" : selectedState,
+            selectedCity: selectedCity === "All City" ? "" : selectedCity,
+          },
+        }
+      );
+      console.log(response, "response");
       setUsers(response.data.data);
       setTotalPages(response.data.totalPages);
       setTotalRecorrds(response.data.totalCount);
@@ -114,7 +117,14 @@ function Customer() {
 
   useEffect(() => {
     fetchData();
-  }, [currentPage, itemsPerPage, searchTerm, selectedState, selectedCity,accessType]);
+  }, [
+    currentPage,
+    itemsPerPage,
+    searchTerm,
+    selectedState,
+    selectedCity,
+    accessType,
+  ]);
 
   const handleNextPage = () => {
     const nextPage = currentPage + 1;
@@ -352,7 +362,6 @@ function Customer() {
             <Table variant="simple">
               <Thead>
                 <Tr>
-
                   <Th>#</Th>
                   <Th>User Image</Th>
                   <Th>Full Name</Th>
@@ -441,7 +450,7 @@ function Customer() {
                               color="black"
                             />
 
-                            <IconButton
+                            {/* <IconButton
                               aria-label={
                                 expandedRow === index ? "Collapse" : "Expand"
                               }
@@ -457,7 +466,7 @@ function Customer() {
                                 toggleRowExpansion(index);
                               }}
                               color="black"
-                            />
+                            /> */}
                           </Flex>
                         </Td>
                       </Tr>
@@ -484,7 +493,7 @@ function Customer() {
                                 bg={useColorModeValue("gray.50", "gray.700")}
                                 style={{ tableLayout: "fixed" }}
                               >
-                                <Thead>
+                                {/* <Thead>
                                   <Tr>
                                     <Th>Email</Th>
                                     <Th>Unit Address</Th>
@@ -505,7 +514,7 @@ function Customer() {
                                     <Td>{user.state}</Td>
                                     <Td>{user.city}</Td>
                                   </Tr>
-                                </Tbody>
+                                </Tbody> */}
                               </Table>
                             </div>
                           </Collapse>

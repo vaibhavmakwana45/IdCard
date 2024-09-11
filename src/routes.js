@@ -62,6 +62,7 @@ import Customer from "savajcapitaldashboard/AddCustomer/Customer";
 import LoanStatus from "loan/LoanStatus";
 import FilePending from "views/Dashboard/FilePending";
 import ViewFileLink from "files/ViewFileLink";
+import AddGroupUser from "adduser/AddGroupUser";
 
 var dashRoutes = [
   //superadmin
@@ -104,20 +105,30 @@ var dashRoutes = [
     key: "alluser",
     hideInSResponsive: true,
   },
-  //files
-  // {
-  //   path: "/filetable",
-  //   name: "Files",
-  //   icon: <DocumentIcon color="inherit" />,
-  //   component: Files,
-  //   layout: "/superadmin",
-  //   parent: "superadmin",
-  //   key: "filetable",
-  //   hideInSResponsive: true,
-  // },
   {
-    path: "/addfile",
-    name: "Add Files",
+    path: "/allgroupuser",
+    name: "Users",
+    icon: <PersonIcon color="inherit" />,
+    component: AddGroupUser,
+    layout: "/superadmin",
+    parent: "superadmin",
+    key: "allgroupuser",
+    hideInSResponsive: true,
+  },
+  //files
+  {
+    path: "/addalldstep",
+    name: "Add Image",
+    icon: <DocumentIcon color="inherit" />,
+    component: LoanStatus,
+    layout: "/superadmin",
+    parent: "superadmin",
+    key: "addalldstep",
+    hideInSResponsive: true,
+  },
+  {
+    path: "/superadmin",
+    name: "Add Image",
     icon: <DocumentIcon color="inherit" />,
     component: AddFiles,
     layout: "/superadmin",
@@ -573,7 +584,7 @@ var dashRoutes = [
   },
   {
     path: "/customer",
-    name: "Customer",
+    name: "Users",
     icon: <PersonIcon color="inherit" />,
     component: Customer,
     layout: "/savajcapitaluser",
@@ -646,20 +657,20 @@ var dashRoutes = [
   //user
   {
     path: "/dashboard",
-    name: "Dashboard",
+    name: "Pass",
     icon: <HomeIcon color="inherit" />,
     component: UserDashboard,
     hideInCustomer: true,
     layout: "/user",
   },
-  {
-    path: "/userfile",
-    name: "User File",
-    icon: <PersonIcon color="inherit" />,
-    component: CustomerFile,
-    layout: "/user",
-    hideInCustomer: false,
-  },
+  // {
+  //   path: "/userfile",
+  //   name: "User File",
+  //   icon: <PersonIcon color="inherit" />,
+  //   component: CustomerFile,
+  //   layout: "/user",
+  //   hideInCustomer: false,
+  // },
   {
     path: "/adduserfile",
     name: "Add user file",

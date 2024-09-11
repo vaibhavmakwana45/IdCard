@@ -25,6 +25,8 @@ import TableComponent from "TableComponent";
 import axios from "axios";
 
 function LoanStatus() {
+  const [imageURL, setImageURL] = useState("");
+  const [imageFile, setImageFile] = useState(null);
   const [allLoanStatus, setAllLoanStatus] = useState([]);
   const textColor = useColorModeValue("gray.700", "white");
   const borderColor = useColorModeValue("gray.200", "gray.600");
@@ -35,13 +37,15 @@ function LoanStatus() {
   const [selectedLoanStatus, setSelectedLoanStatus] = useState("");
   const [selectedColor, setSelectedColor] = useState("#ffffff");
 
-  const restrictedIds = ["1718861593296", "1718861587262", "1718861579508"];
-
+  const [formData, setFormData] = useState({
+    backgroundImage: "",
+  });
   const getLoanStatusData = async () => {
     try {
       const response = await AxiosInstance.get("/loanstatus");
       if (response.data.success) {
         setAllLoanStatus(response.data.data);
+        console.log(response);
         setLoading(false);
       } else if (response.data.statusCode === 201) {
         setLoading(false);
@@ -64,26 +68,22 @@ function LoanStatus() {
   }, []);
 
   const allHeaders = [
-    "Index",
-    "Loan Status",
-    "Color",
+    // "Index",
+    "Background Image",
     "Create Date",
     "Update Date",
     "Action",
   ];
 
   const formattedData = filteredLoanStatus.map((loanstatus, index) => [
-    loanstatus.loanstatus_id,
-    index + 1,
+    // index + 1,
     loanstatus.loanstatus,
-    <div
-      key={loanstatus.loanstatus_id}
-      style={{
-        width: "20px",
-        height: "20px",
-        backgroundColor: loanstatus.color,
-        borderRadius: "50%",
-      }}
+    <img
+      src={`https://cdn.savajcapital.com/cdn/files/${loanstatus.backgroundImage}`}
+      alt="Background"
+      width="100"
+      height="100"
+      style={{ marginBottom: "10px", paddingBottom: "10px" }}
     />,
     loanstatus.createdAt,
     loanstatus.updatedAt,
@@ -107,9 +107,11 @@ function LoanStatus() {
         );
         toast.success("Loan Status deleted successfully!");
       } else if (response.data.statusCode === 201) {
-        toast.error(response.data.message);
+        toast.error("Don't have permission to delete");
       } else {
-        toast.error(response.data.message || "Please try again later!");
+        toast.error(
+          "Don't have permission to delete" || "Please try again later!"
+        );
       }
       setIsDeleteDialogOpen(false);
     } catch (error) {
@@ -123,34 +125,74 @@ function LoanStatus() {
     setSelectedIsLoanStatusId(id);
     setIsDeleteDialogOpen(true);
   };
-
-  const handleEdit = (id) => {
-    setSelectedLoanStatusId(id);
-    setIsLoanStatus(true);
-    const doc = allLoanStatus.find((doc) => doc.loanstatus_id === id);
+  const handleEdit = () => {
+    const doc = allLoanStatus[0]; // Get the first item
     if (doc) {
-      setSelectedLoanStatus(doc.loanstatus);
-      setSelectedColor(doc.color);
+      setSelectedLoanStatusId(doc.loanstatus_id);
+      setFormData({ backgroundImage: doc.backgroundImage || "" });
+      setIsLoanStatus(true);
     } else {
-      console.error("Loan Status not found for id:", id);
+      console.error("No loan status found.");
     }
   };
 
+
+  useEffect(() => {
+    console.log("All Loan Status:", allLoanStatus);
+  }, [allLoanStatus]);
+
   const handleRow = (id) => {};
 
-  const handleAddLoanStatus = async (loanstatus) => {
+  console.log(formData, "formData");
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setFormData((prev) => ({ ...prev, backgroundImage: "" })); // Clear existing backgroundImage
+    }
+  };
+
+
+  const handleAddLoanStatus = async () => {
     try {
+      let userimageUrl = formData.backgroundImage; // Use backgroundImage from formData
+
+      if (imageFile) {
+        const imageData = new FormData();
+        imageData.append("files", imageFile);
+
+        const uploadResponse = await axios.post(
+          "https://cdn.savajcapital.com/api/upload",
+          imageData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (
+          uploadResponse.data.status === "ok" &&
+          uploadResponse.data.files.length > 0
+        ) {
+          userimageUrl = uploadResponse.data.files[0].filename;
+        } else {
+          toast.error("Failed to upload the image. Please try again.");
+          setLoading(false);
+          return;
+        }
+      }
+
       const response = await AxiosInstance.post("/loanstatus", {
-        loanstatus,
-        color: selectedColor,
+        backgroundImage: userimageUrl,
       });
+
       if (response.data.success) {
         toast.success("Loan Status added successfully!");
         setIsLoanStatus(false);
         setSelectedLoanStatusId("");
         getLoanStatusData();
         setLoanStatus("");
-        setSelectedColor("#ffffff");
       } else {
         toast.error(response.data.message || "Please try again later!");
       }
@@ -164,11 +206,38 @@ function LoanStatus() {
 
   const editLoanStatus = async (loanstatus) => {
     try {
+      let userimageUrl = formData.backgroundImage; // Use existing image URL
+
+      if (imageFile) {
+        const imageData = new FormData();
+        imageData.append("files", imageFile);
+
+        const uploadResponse = await axios.post(
+          "https://cdn.savajcapital.com/api/upload",
+          imageData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (
+          uploadResponse.data.status === "ok" &&
+          uploadResponse.data.files.length > 0
+        ) {
+          userimageUrl = uploadResponse.data.files[0].filename;
+        } else {
+          toast.error("Failed to upload the image. Please try again.");
+          setLoading(false);
+          return;
+        }
+      }
+
       const response = await AxiosInstance.put(
-        "/loanstatus/" + selectedLoanStatusId,
+        `/loanstatus/${selectedLoanStatusId}`,
         {
-          loanstatus,
-          color: selectedColor,
+          backgroundImage: userimageUrl,
         }
       );
 
@@ -230,7 +299,7 @@ function LoanStatus() {
                 }}
               />
 
-              <Button
+              {/* <Button
                 onClick={() => {
                   setIsLoanStatus(true);
                 }}
@@ -240,8 +309,8 @@ function LoanStatus() {
                   color: "#fff",
                 }}
               >
-                Add Loan Status
-              </Button>
+                Add Image
+              </Button> */}
             </Flex>
           </CardHeader>
           <CardBody>
@@ -309,43 +378,33 @@ function LoanStatus() {
               </AlertDialogHeader>
 
               <AlertDialogBody>
-                <FormControl id="loanstatus" isRequired>
-                  <Input
-                    name="loanstatus"
-                    onChange={(e) => {
-                      if (selectedLoanStatusId === "") {
-                        setLoanStatus(e.target.value);
-                      } else {
-                        setSelectedLoanStatus(e.target.value);
-                      }
-                    }}
-                    value={
-                      selectedLoanStatusId === ""
-                        ? loanstatus
-                        : selectedLoanStatus
-                    }
-                    placeholder="Add loan status"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        if (selectedLoanStatusId) {
-                          editLoanStatus(selectedLoanStatus);
-                        } else {
-                          handleAddLoanStatus(loanstatus);
-                        }
-                      }
-                    }}
-                  />
-                </FormControl>
-                {!restrictedIds.includes(selectedLoanStatusId) && (
-                  <FormControl id="color" mt={4}>
-                    <Text mb={2}>Select Color</Text>
-                    <SketchPicker
-                      color={selectedColor}
-                      onChangeComplete={(color) => setSelectedColor(color.hex)}
+                <FormControl id="imageUpload" mb={4} width="300px">
+                  <Text
+                    fontSize="lg"
+                    fontWeight="bold"
+                    mb={2}
+                    color={textColor}
+                  >
+                    Upload Image via CDN
+                  </Text>
+                  <FormControl id="userimage" mt={4}>
+                    <div>
+                      <img
+                        src={`https://cdn.savajcapital.com/cdn/files/${formData.backgroundImage}`}
+                        alt="Uploade Image First"
+                        width="100"
+                        height="100"
+                        style={{ marginBottom: "10px", paddingBottom: "10px" }}
+                      />
+                    </div>
+
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
                     />
                   </FormControl>
-                )}
+                </FormControl>
               </AlertDialogBody>
 
               <AlertDialogFooter>
@@ -366,9 +425,9 @@ function LoanStatus() {
                   colorScheme="blue"
                   onClick={() => {
                     if (selectedLoanStatusId) {
-                      editLoanStatus(selectedLoanStatus);
+                      editLoanStatus();
                     } else {
-                      handleAddLoanStatus(loanstatus);
+                      handleAddLoanStatus();
                     }
                   }}
                   ml={3}

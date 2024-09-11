@@ -46,7 +46,7 @@ export default function Dashboard() {
     const fetchDataCount = async () => {
       try {
         const response = await AxiosInstance.get("/allcount/data-count");
-        console.log(response)
+        console.log(response);
         setDataCount(response.data);
       } catch (error) {
         console.error("Failed to fetch data count:", error);
@@ -152,7 +152,7 @@ export default function Dashboard() {
                 (Savaj Capital)
               </StatLabel> */}
               <StatNumber fontSize="2xl" color={textColor} fontWeight="bold">
-                {dataCount.users}
+                {dataCount.savajuser}
               </StatNumber>
             </Stat>
           </Flex>
@@ -200,7 +200,7 @@ export default function Dashboard() {
                 Capital User
               </StatLabel> */}
               <StatNumber fontSize="2xl" color={textColor} fontWeight="bold">
-                {dataCount.savajcapitalbrnach}
+                {dataCount.users}
               </StatNumber>
             </Stat>
           </Flex>

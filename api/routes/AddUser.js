@@ -12,6 +12,8 @@ const crypto = require("crypto");
 const axios = require("axios");
 const Loan = require("../models/Loan/Loan");
 const Loan_Type = require("../models/Loan/Loan_Type");
+const LoanStatus = require("../models/AddDocuments/LoanStatus");
+
 // const Loan_Documents = require("../../models/Loan/Loan_Documents");
 
 const encrypt = (text) => {
@@ -274,6 +276,85 @@ router.get("/getallusers/:group_id", async (req, res) => {
   }
 });
 
+router.get("/getallgroupusers", async (req, res) => {
+  try {
+    const currentPage = parseInt(req.query.page) || 1;
+    const dataPerPage = parseInt(req.query.limit) || 10;
+    const searchTerm = req.query.searchTerm;
+
+    const matchStage = {};
+
+    // Filter based on searchTerm
+    if (searchTerm) {
+      matchStage.$or = [
+        { username: { $regex: new RegExp(searchTerm, "i") } },
+        { businessname: { $regex: new RegExp(searchTerm, "i") } },
+        { email: { $regex: new RegExp(searchTerm, "i") } },
+        { number: { $regex: new RegExp(searchTerm, "i") } },
+        { pan_card: { $regex: new RegExp(searchTerm, "i") } },
+        { aadhar_card: parseInt(searchTerm) || -1 },
+      ];
+    }
+
+    // Filter based on state and city if needed
+    const selectedState = req.query.selectedState || "";
+    if (selectedState) {
+      matchStage.state = selectedState;
+    }
+
+    const selectedCity = req.query.selectedCity || "";
+    if (selectedCity) {
+      matchStage.city = selectedCity;
+    }
+
+    // Step 1: Get the mapping of group_id to groupname from AddSavajUser collection
+    const groupMapping = await SavajCapital_User.aggregate([
+      { $group: { _id: "$group_id", groupname: { $first: "$groupname" } } }
+    ]);
+
+    const groupMap = groupMapping.reduce((acc, group) => {
+      acc[group._id] = group.groupname;
+      return acc;
+    }, {});
+
+    // Step 2: Get the total count of documents matching the query
+    const totalDataCount = await AddUser.countDocuments(matchStage);
+
+    // Pipeline for aggregation
+    const pipeline = [
+      { $match: matchStage },
+      { $sort: { updatedAt: -1 } },
+      { $skip: (currentPage - 1) * dataPerPage },
+      { $limit: dataPerPage },
+    ];
+
+    const data = await AddUser.aggregate(pipeline);
+
+    // Enrich data with groupname
+    const enrichedData = data.map(user => ({
+      ...user,
+      groupname: groupMap[user.group_id] || 'Unknown' // Default to 'Unknown' if group_id is not found
+    }));
+
+    // Sending response with data and pagination info
+    res.json({
+      statusCode: 200,
+      data: enrichedData,
+      totalPages: Math.ceil(totalDataCount / dataPerPage),
+      currentPage,
+      totalCount: totalDataCount,
+      message: "Read All Request",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+});
+
+
 
 router.get("/getcustomers/:state/:city", async (req, res) => {
   const { state, city } = req.params;
@@ -382,18 +463,50 @@ router.get("/getcustomers/:state/:city", async (req, res) => {
 
 router.get("/:user_id", async (req, res) => {
   try {
-    const user_id = req.params.user_id;
+    const { user_id } = req.params;
+
+    // Fetch user data using user_id
     const user = await AddUser.findOne({ user_id });
 
     if (!user) {
-      return res
-        .status(200)
-        .send({ statusCode: 201, message: "User not found" });
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
+
+    const { group_id } = user;
+
+    // Fetch background image from LoanStatus collection using group_id
+    const loanStatus = await LoanStatus.findOne();
+
+    if (!loanStatus) {
+      return res.status(404).json({
+        success: false,
+        message: "LoanStatus record not found",
+      });
+    }
+
+    // Fetch group image from SavajCapital_User collection using group_id
+    const groupUser = await SavajCapital_User.findOne({ group_id });
+
+    if (!groupUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Group user record not found",
+      });
+    }
+
+    // Construct user data response
+    const userData = {
+      ...user._doc,
+      backgroundImage: loanStatus.backgroundImage,
+      groupimage: groupUser.groupimage,
+    };
 
     res.json({
       success: true,
-      user,
+      user: userData,
     });
   } catch (error) {
     console.error(error);

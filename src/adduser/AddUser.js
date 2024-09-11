@@ -135,7 +135,7 @@ function AddUser(props) {
         );
       } else {
         response = await AxiosInstance.put(
-          "/addusers/edituser/" + id,
+          "/savaj_user/editsavajuser/" + id,
           submissionData.userDetails
         );
       }
@@ -215,7 +215,7 @@ function AddUser(props) {
                 />
               </FormControl>
 
-              <FormControl id="groupcount" mt={4} isRequired>
+              {/* <FormControl id="groupcount" mt={4} isRequired>
                 <FormLabel>Enter Group Count</FormLabel>
                 <Input
                   name="groupcount"
@@ -224,7 +224,7 @@ function AddUser(props) {
                   value={formData.groupcount}
                   placeholder="Enter Group Count"
                 />
-              </FormControl>
+              </FormControl> */}
 
               <Text fontSize="xl" color={textColor} fontWeight="bold" mt={6}>
                 Login Credentials

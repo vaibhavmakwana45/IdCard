@@ -287,8 +287,6 @@
 
 // export default SignIn;
 
-
-
 import React, { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useHistory } from "react-router-dom";
@@ -444,17 +442,32 @@ function SignIn() {
             bg={bgForm}
             borderRadius="15px"
             p={{ base: "20px", md: "40px" }}
-            boxShadow={useColorModeValue("0px 5px 14px rgba(0, 0, 0, 0.05)", "unset")}
+            boxShadow={useColorModeValue(
+              "0px 5px 14px rgba(0, 0, 0, 0.05)",
+              "unset"
+            )}
           >
-            <Text fontSize="xl" color={textColor} fontWeight="bold" textAlign="center" mb="22px">
+            <Text
+              fontSize="xl"
+              color={textColor}
+              fontWeight="bold"
+              textAlign="center"
+              mb="22px"
+            >
               <img src={logo} alt="Logo" />
             </Text>
-            <Text fontSize="xl" color={textColor} fontWeight="bold" textAlign="center" mb="22px">
+            <Text
+              fontSize="xl"
+              color={textColor}
+              fontWeight="bold"
+              textAlign="center"
+              mb="22px"
+            >
               Login With
             </Text>
             <FormControl as="form" onSubmit={handleSubmit}>
               <FormLabel ms="4px" fontSize="sm" fontWeight="normal">
-                Email or UserId
+                User
               </FormLabel>
               <Input
                 fontSize="sm"
@@ -504,7 +517,12 @@ function SignIn() {
                 SIGN IN
               </Button>
             </FormControl>
-            <Flex flexDirection="column" justifyContent="center" alignItems="center" maxW="100%">
+            {/* <Flex
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
+              maxW="100%"
+            >
               <Text color={textColor} fontWeight="medium">
                 Don't have an account?
                 <Text
@@ -519,7 +537,7 @@ function SignIn() {
                   Sign Up
                 </Text>
               </Text>
-            </Flex>
+            </Flex> */}
           </Flex>
         </Flex>
       </Flex>

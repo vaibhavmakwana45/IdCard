@@ -34,14 +34,15 @@ import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
 import CardHeader from "components/Card/CardHeader.js";
 import AxiosInstance from "config/AxiosInstance";
-import "./user.css";
+// import "./user.css";
 import { Country, State, City } from "country-state-city";
 import {
   KeyboardArrowUp as KeyboardArrowUpIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
 } from "@mui/icons-material";
+import { jwtDecode } from "jwt-decode";
 
-function UserTable() {
+function AddGroupUser() {
   const [users, setUsers] = useState([]);
   const textColor = useColorModeValue("gray.700", "white");
   const borderColor = useColorModeValue("gray.200", "gray.600");
@@ -56,6 +57,14 @@ function UserTable() {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [expandedRow, setExpandedRow] = useState(null);
   const cancelRef = React.useRef();
+  const [accessType, setAccessType] = useState("");
+
+  React.useEffect(() => {
+    const jwt = jwtDecode(localStorage.getItem("authToken"));
+    setAccessType(jwt._id);
+  }, []);
+
+  console.log(accessType, "vaibhav");
 
   const states = State.getStatesOfCountry("IN");
 
@@ -82,18 +91,15 @@ function UserTable() {
 
   const fetchData = async () => {
     try {
-      const response = await AxiosInstance.get(
-        "/savaj_user/SavajCapital_User",
-        {
-          params: {
-            page: currentPage,
-            limit: itemsPerPage,
-            searchTerm: searchTerm,
-            selectedState: selectedState === "All State" ? "" : selectedState,
-            selectedCity: selectedCity === "All City" ? "" : selectedCity,
-          },
-        }
-      );
+      const response = await AxiosInstance.get(`/addusers/getallgroupusers`, {
+        params: {
+          page: currentPage,
+          limit: itemsPerPage,
+          searchTerm: searchTerm,
+          selectedState: selectedState === "All State" ? "" : selectedState,
+          selectedCity: selectedCity === "All City" ? "" : selectedCity,
+        },
+      });
       setUsers(response.data.data);
       setTotalPages(response.data.totalPages);
       setTotalRecorrds(response.data.totalCount);
@@ -145,7 +151,7 @@ function UserTable() {
         );
         setUsers(
           users.map((user) =>
-            user.group_id === id ? { ...user, isActivate: activate } : user
+            user.user_id === id ? { ...user, isActivate: activate } : user
           )
         );
         setIsConfirmOpen(false);
@@ -197,12 +203,12 @@ function UserTable() {
   };
 
   const handleDelete = (id) => {
-    setSelectedUserId(id);
-    setIsDeleteDialogOpen(true);
+    // setSelectedUserId(id);
+    // setIsDeleteDialogOpen(true);
   };
 
   const handleEdit = (id) => {
-    history.push("/superadmin/adduser?id=" + id);
+    // history.push("/savajcapitaluser/addcustomer?id=" + id);
   };
 
   const toggleRowExpansion = (index) => {
@@ -211,12 +217,14 @@ function UserTable() {
 
   const deleteBranch = async (userId) => {
     try {
-      const response = await AxiosInstance.delete(`/savaj_user/${userId}`);
+      const response = await AxiosInstance.delete(
+        `/addusers/deleteuser/${userId}`
+      );
 
       if (response.data.success) {
         setIsDeleteDialogOpen(false);
         toast.success("User deleted successfully!");
-        setUsers(users.filter((user) => user.group_id !== userId));
+        setUsers(users.filter((user) => user.user_id !== userId));
       } else if (response.data.statusCode === 201) {
         toast.error(response.data.message);
         setIsDeleteDialogOpen(false);
@@ -245,7 +253,7 @@ function UserTable() {
                   bgClip="text"
                   className="ttext"
                 >
-                  All Groups
+                  All Users
                 </Text>
               </Box>
             </Flex>
@@ -323,8 +331,8 @@ function UserTable() {
                   transition: "all 0.3s ease-in-out",
                 }}
               /> */}
-              <Button
-                onClick={() => history.push("/superadmin/adduser")}
+              {/* <Button
+                onClick={() => history.push("/savajcapitaluser/addcustomer")}
                 colorScheme="blue"
                 style={{
                   padding: "10px",
@@ -335,8 +343,8 @@ function UserTable() {
                   transition: "all 0.3s ease-in-out",
                 }}
               >
-                Add Groups
-              </Button>
+                Add User
+              </Button> */}
             </Flex>
           </CardHeader>
           <CardBody>
@@ -344,12 +352,12 @@ function UserTable() {
               <Thead>
                 <Tr>
                   <Th>#</Th>
-                  <Th>Group Image</Th>
                   <Th>Group Name</Th>
-                  <Th>Group Number</Th>
-                  <Th>Group Mobil Number</Th>
-                  <Th>Group Count</Th>
-                  <Th>Group Userid</Th>
+                  <Th>User Image</Th>
+                  <Th>Full Name</Th>
+
+                  <Th>Mobil Number</Th>
+
                   <Th>Actions</Th>
                 </Tr>
               </Thead>
@@ -383,7 +391,7 @@ function UserTable() {
                   </Tr>
                 ) : (
                   users.map((user, index) => (
-                    <React.Fragment key={user.group_id}>
+                    <React.Fragment key={user.user_id}>
                       <Tr
                         onClick={() => toggleRowExpansion(index)}
                         cursor="pointer"
@@ -394,9 +402,11 @@ function UserTable() {
                         }}
                       >
                         <Td>{index + 1}</Td>
+                        <Td>{user.groupname || "N/A"}</Td>
+
                         <Td>
                           <img
-                            src={`https://cdn.savajcapital.com/cdn/files/${user.groupimage}`}
+                            src={`https://cdn.savajcapital.com/cdn/files/${user.userimage}`}
                             alt="User Image"
                             style={{
                               width: "50px",
@@ -406,10 +416,8 @@ function UserTable() {
                           />
                         </Td>
 
-                        <Td>{user.groupname || "N/A"}</Td>
-                        <Td>{user.groupnumber || "N/A"}</Td>
-                        <Td>{user.groupmobilnumber || "N/A"}</Td>
-                        <Td>{user.userCountInGroup || "0"}</Td>
+                        <Td>{user.fullname || "N/A"}</Td>
+
                         <Td>{user.email || "N/A"}</Td>
                         <Td>
                           <Flex>
@@ -418,7 +426,7 @@ function UserTable() {
                               icon={<EditIcon />}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleEdit(user.group_id);
+                                handleEdit(user.user_id);
                               }}
                               mr={2}
                               color="black"
@@ -428,7 +436,7 @@ function UserTable() {
                               icon={<DeleteIcon />}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDelete(user.group_id);
+                                handleDelete(user.user_id);
                               }}
                               mr={2}
                               color="black"
@@ -630,4 +638,4 @@ function UserTable() {
   );
 }
 
-export default UserTable;
+export default AddGroupUser;
