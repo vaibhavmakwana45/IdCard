@@ -1,0 +1,45 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.home{
+    /* background: url(./day1.png); */
+    height: 100vh;
+    width: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.scalloped-shape img{
+    width: 180px;
+    height: 220px;
+    border-radius: 30px 30px 0 0;
+    border: 3px solid #A90108;
+    margin-top: 198px;
+    object-fit: cover;
+    object-position: top center;
+}
+
+.scalloped-shape{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.name-text h1{
+    font-family: Poppins;
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #A90108;
+}
+.name-text {
+    margin-top: 2rem;
+}
